@@ -1,3 +1,6 @@
+pub mod Token_Analyzer;
+
+
 #[cfg(test)]
 mod tests {
     #[test]
