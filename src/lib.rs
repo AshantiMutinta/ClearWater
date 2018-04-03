@@ -1,4 +1,4 @@
-pub mod Token_Analyzer;
+pub mod token_analyzer;
 
 
 #[cfg(test)]
