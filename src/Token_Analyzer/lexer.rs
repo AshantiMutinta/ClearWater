@@ -78,8 +78,6 @@ impl<'a> PartialEq for TokenMatch<'a> {
 
 fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) -> Result<Vec<Token<'a>>,TokenError>
 {
-    println!("started function");
-    println!("line of code to use{:}" , line_of_code);
     if(line_of_code.len()<=0)
     {
         Err(TokenError::empty_line_of_code)
@@ -88,7 +86,6 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
     { 
         let mut tokens = vec![];
         let mut match_heap = BinaryHeap::new();
-        println!("token rules processing");
         token_rules
         .iter()
         .map(|token_match_rule|
@@ -103,7 +100,6 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
                     
                     matched_rules.map(|t|
                     {
-                         println!("push into binary tree{:}",t.as_str().clone());
                         match_heap.push(TokenMatch{
                             literal : String::from(t.as_str()),
                             begin_segmet : t.start().clone(),
@@ -118,7 +114,6 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
 
             };
         }).collect::<Vec<_>>();
-        println!("finished creating binary tree");
         match match_heap.pop()
         {
             Some(first_match) =>
@@ -128,21 +123,15 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
                     token_type : first_match.rule.token_type
 
                 });
-
-                println!("after pop push {:}",first_match.literal.clone());
-
+                
                 let mut mutable_line_of_code = line_of_code.clone();
                 mutable_line_of_code.split_off(first_match.begin_segmet);
-                println!("begin string segment {:}",first_match.begin_segmet);
                 let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
-                println!("end string segment {:}",first_match.end_segment);
                 mutable_line_of_code.push_str(&end_range);
-                println!("string to utitlize {:}",mutable_line_of_code);
                 match tokenize_line(mutable_line_of_code,token_rules)
                 {
                     Ok(tokenized) =>
                     {
-                        println!("going to extent token");
                         tokens.extend(tokenized);
                         Ok(tokens)
                     },
