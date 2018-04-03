@@ -120,7 +120,7 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
             {
                 tokens.push(Token{
                     content : first_match.literal.clone(),
-                    token_type : first_match.rule.token_type
+                    token_type : &first_match.rule.token_type
 
                 });
                 
@@ -159,8 +159,12 @@ fn test_tokenizer()
         regex_rule : String::from(r";")
     }];
 
-    let tokens = tokenize_line(String::from(";;"), &token_rules);
-    assert_eq!(tokens.expect("expected tokens").len(),2);
+    let tokens = tokenize_line(String::from(";;"), &token_rules).expect("expect tokens");
+    assert_eq!(tokens.len(),2);
+
+    let first_token = tokens.first().expect("expected token after first");
+    assert_eq!(first_token.content,";");
+    assert_eq!(first_token.token_type,&TokenType::ending_terminator);
 }
 
 
