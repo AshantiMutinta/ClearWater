@@ -8,7 +8,7 @@ use std::cmp::Ordering;
 
 
 
-
+#[derive(PartialEq,Eq,Debug)]
 enum TokenError
 {
     empty_line_of_code,
@@ -16,7 +16,7 @@ enum TokenError
     no_match
 }
 
-#[derive(PartialEq,Eq)]
+#[derive(PartialEq,Eq,Debug)]
 enum TokenType
 {
     alphanumeric,
@@ -27,6 +27,8 @@ enum TokenType
     special_character,
     ending_terminator
 }
+
+#[derive(PartialEq,Eq,Debug)]
 struct Token<'a>
 {
     content : String,
@@ -74,9 +76,10 @@ impl<'a> PartialEq for TokenMatch<'a> {
 }
 
 
-
 fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) -> Result<Vec<Token<'a>>,TokenError>
 {
+    println!("started function");
+    println!("line of code to use{:}" , line_of_code);
     if(line_of_code.len()<=0)
     {
         Err(TokenError::empty_line_of_code)
@@ -85,6 +88,7 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
     { 
         let mut tokens = vec![];
         let mut match_heap = BinaryHeap::new();
+        println!("token rules processing");
         token_rules
         .iter()
         .map(|token_match_rule|
@@ -99,7 +103,7 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
                     
                     matched_rules.map(|t|
                     {
-                        let start_segment = t.start();
+                         println!("push into binary tree{:}",t.as_str().clone());
                         match_heap.push(TokenMatch{
                             literal : String::from(t.as_str()),
                             begin_segmet : t.start().clone(),
@@ -107,36 +111,44 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
                             rule : token_match_rule
 
                         });
-                    });
+                    }).collect::<Vec<_>>();
                      
                 },
                 Err(_)=>{();}
 
             };
         }).collect::<Vec<_>>();
-
+        println!("finished creating binary tree");
         match match_heap.pop()
         {
             Some(first_match) =>
             {
                 tokens.push(Token{
-                    content : first_match.literal,
+                    content : first_match.literal.clone(),
                     token_type : first_match.rule.token_type
 
                 });
 
-                let sub_string_chars = line_of_code.chars().skip(first_match.begin_segmet).take(first_match.end_segment).collect::<Vec<char>>();
-                let sub_string : String= sub_string_chars.into_iter().collect();
-                match tokenize_line(sub_string,token_rules)
+                println!("after pop push {:}",first_match.literal.clone());
+
+                let mut mutable_line_of_code = line_of_code.clone();
+                mutable_line_of_code.split_off(first_match.begin_segmet);
+                println!("begin string segment {:}",first_match.begin_segmet);
+                let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
+                println!("end string segment {:}",first_match.end_segment);
+                mutable_line_of_code.push_str(&end_range);
+                println!("string to utitlize {:}",mutable_line_of_code);
+                match tokenize_line(mutable_line_of_code,token_rules)
                 {
                     Ok(tokenized) =>
                     {
+                        println!("going to extent token");
                         tokens.extend(tokenized);
-                        return Ok(tokens)
+                        Ok(tokens)
                     },
                     Err(_) =>
                     {
-                        Err(TokenError::matching_error)
+                        Ok(tokens)
                     }
                 }
 
@@ -153,7 +165,13 @@ fn tokenize_line<'a>(line_of_code :String, token_rules : &'a Vec<TokenRules>) ->
 #[test]
 fn test_tokenizer()
 {
-    
+    let token_rules = vec![TokenRules{
+        token_type : &TokenType::ending_terminator,
+        regex_rule : String::from(r";")
+    }];
+
+    let tokens = tokenize_line(String::from(";;"), &token_rules);
+    assert_eq!(tokens.expect("expected tokens").len(),2);
 }
 
 
