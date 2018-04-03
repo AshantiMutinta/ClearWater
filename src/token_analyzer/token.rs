@@ -2,57 +2,48 @@ use std::cmp::Ord;
 use std::cmp::Ordering;
 
 #[derive(Eq)]
-pub struct TokenMatch<'a>
-{
-    pub literal : String,
-    pub begin_segmet : usize,
-    pub end_segment : usize,
-    pub rule : &'a TokenRules<'a>
+pub struct TokenMatch<'a> {
+    pub literal: String,
+    pub begin_segmet: usize,
+    pub end_segment: usize,
+    pub rule: &'a TokenRules<'a>,
 }
 
-#[derive(PartialEq,Eq,Debug)]
-pub enum TokenError
-{
+#[derive(PartialEq, Eq, Debug)]
+pub enum TokenError {
     EmptyLineOfCode,
     MatchingError,
-    NoMatch
+    NoMatch,
 }
 
-#[derive(PartialEq,Eq,Debug)]
-pub enum TokenType
-{
+#[derive(PartialEq, Eq, Debug)]
+pub enum TokenType {
     Alphanumeric,
     Literal,
     Number,
     Keyword,
     Space,
     SpecialCharacter,
-    EndingTerminator
+    EndingTerminator,
 }
 
-#[derive(PartialEq,Eq,Debug)]
-pub struct Token<'a>
-{
-    pub content : String,
-    pub token_type : &'a TokenType
+#[derive(PartialEq, Eq, Debug)]
+pub struct Token<'a> {
+    pub content: String,
+    pub token_type: &'a TokenType,
 }
 
-#[derive(PartialEq,Eq)]
-pub struct TokenRules<'a>
-{
-    pub token_type : &'a TokenType,
+#[derive(PartialEq, Eq)]
+pub struct TokenRules<'a> {
+    pub token_type: &'a TokenType,
     pub regex_rule: String,
 }
 
-
-impl<'a> Ord for TokenMatch<'a>
-{
-    fn cmp(&self,other:&TokenMatch) -> Ordering
-    {
+impl<'a> Ord for TokenMatch<'a> {
+    fn cmp(&self, other: &TokenMatch) -> Ordering {
         self.begin_segmet.cmp(&other.begin_segmet)
     }
 }
-
 
 impl<'a> PartialOrd for TokenMatch<'a> {
     fn partial_cmp(&self, other: &TokenMatch) -> Option<Ordering> {
@@ -61,10 +52,8 @@ impl<'a> PartialOrd for TokenMatch<'a> {
 }
 
 impl<'a> PartialEq for TokenMatch<'a> {
-    fn eq(&self, other: &TokenMatch) -> bool 
-    {
-        (self.literal == other.literal) && 
-        (self.begin_segmet== other.begin_segmet) &&
-        (self.end_segment == other.end_segment)
+    fn eq(&self, other: &TokenMatch) -> bool {
+        (self.literal == other.literal) && (self.begin_segmet == other.begin_segmet)
+            && (self.end_segment == other.end_segment)
     }
 }

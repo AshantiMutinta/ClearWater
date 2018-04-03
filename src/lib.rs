@@ -1,6 +1,5 @@
 pub mod token_analyzer;
 
-
 #[cfg(test)]
 mod tests {
     #[test]
