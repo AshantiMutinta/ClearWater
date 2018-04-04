@@ -63,8 +63,6 @@ fn tokenize_line<'a>(
 
 #[test]
 fn test_ending_terminator() {
-   
-
     let tokens = tokenize_line(String::from(" ; ; "), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 2);
 

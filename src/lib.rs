@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 
-
 pub mod token_analyzer;
 
 #[cfg(test)]
