@@ -1,3 +1,4 @@
+
 use std::cmp::Ord;
 use std::cmp::Ordering;
 
@@ -56,4 +57,25 @@ impl<'a> PartialEq for TokenMatch<'a> {
         (self.literal == other.literal) && (self.begin_segmet == other.begin_segmet)
             && (self.end_segment == other.end_segment)
     }
+}
+
+pub static KEYWORD: &'static str = r"[A-z]+$";
+
+pub static ENDING_TERMINATOR: &'static str = ";";
+
+lazy_static! {
+    pub static ref RULES: Vec<TokenRules<'static>> = {
+        vec![
+            TokenRules{
+                token_type : &TokenType::Keyword,
+                regex_rule : String::from(KEYWORD)
+            },
+            TokenRules{
+                token_type : &TokenType::EndingTerminator,
+                regex_rule : String::from(ENDING_TERMINATOR)
+            }
+        ]
+
+    };
+        
 }

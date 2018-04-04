@@ -3,7 +3,6 @@ extern crate regex;
 use self::regex::Regex;
 use std::collections::BinaryHeap;
 use token_analyzer::token;
-use token_analyzer::token_regex_rules;
 
 fn tokenize_line<'a>(
     line_of_code: String,
@@ -64,14 +63,9 @@ fn tokenize_line<'a>(
 
 #[test]
 fn test_ending_terminator() {
-    let token_rules = vec![
-        token::TokenRules {
-            token_type: &token::TokenType::EndingTerminator,
-            regex_rule: String::from(token_regex_rules::ENDING_TERMINATOR),
-        },
-    ];
+   
 
-    let tokens = tokenize_line(String::from(" ; ; "), &token_rules).expect("expect tokens");
+    let tokens = tokenize_line(String::from(" ; ; "), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 2);
 
     let first_token = tokens.first().expect("expected token after first");
@@ -81,19 +75,8 @@ fn test_ending_terminator() {
 
 #[test]
 fn test_alphabetic() {
-    let token_rules = vec![
-        token::TokenRules {
-            token_type: &token::TokenType::EndingTerminator,
-            regex_rule: String::from(token_regex_rules::ENDING_TERMINATOR),
-        },
-        token::TokenRules {
-            token_type: &token::TokenType::Keyword,
-            regex_rule: String::from(token_regex_rules::KEYWORD),
-        },
-    ];
-
     let tokens =
-        tokenize_line(String::from("thisforme;again"), &token_rules).expect("expect tokens");
+        tokenize_line(String::from("thisforme;again"), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 3);
 
     let first_token = tokens.first().expect("expected token after first");
