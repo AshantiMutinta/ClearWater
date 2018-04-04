@@ -77,3 +77,29 @@ fn test_ending_terminator() {
     assert_eq!(first_token.content, ";");
     assert_eq!(first_token.token_type, &token::TokenType::EndingTerminator);
 }
+
+#[test]
+fn test_alphabetic() {
+    let token_rules = vec![
+        token::TokenRules {
+            token_type: &token::TokenType::EndingTerminator,
+            regex_rule: String::from(r";"),
+        },
+        token::TokenRules {
+            token_type: &token::TokenType::Keyword,
+            regex_rule: String::from(r"[A-z]+$"),
+        },
+    ];
+
+    let tokens =
+        tokenize_line(String::from("thisforme;again"), &token_rules).expect("expect tokens");
+    assert_eq!(tokens.len(), 3);
+
+    let first_token = tokens.first().expect("expected token after first");
+    assert_eq!(first_token.content, "again");
+    assert_eq!(first_token.token_type, &token::TokenType::Keyword);
+
+    let last_token = tokens.get(2).expect("expected token after get");
+    assert_eq!(last_token.content, "thisforme");
+    assert_eq!(last_token.token_type, &token::TokenType::Keyword);
+}
