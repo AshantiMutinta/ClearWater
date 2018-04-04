@@ -3,6 +3,7 @@ extern crate regex;
 use self::regex::Regex;
 use std::collections::BinaryHeap;
 use token_analyzer::token;
+use token_analyzer::token_regex_rules;
 
 fn tokenize_line<'a>(
     line_of_code: String,
@@ -66,7 +67,7 @@ fn test_ending_terminator() {
     let token_rules = vec![
         token::TokenRules {
             token_type: &token::TokenType::EndingTerminator,
-            regex_rule: String::from(r";"),
+            regex_rule: String::from(token_regex_rules::ENDING_TERMINATOR),
         },
     ];
 
@@ -83,11 +84,11 @@ fn test_alphabetic() {
     let token_rules = vec![
         token::TokenRules {
             token_type: &token::TokenType::EndingTerminator,
-            regex_rule: String::from(r";"),
+            regex_rule: String::from(token_regex_rules::ENDING_TERMINATOR),
         },
         token::TokenRules {
             token_type: &token::TokenType::Keyword,
-            regex_rule: String::from(r"[A-z]+$"),
+            regex_rule: String::from(token_regex_rules::KEYWORD),
         },
     ];
 
