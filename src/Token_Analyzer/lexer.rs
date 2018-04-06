@@ -79,9 +79,21 @@ fn test_alphabetic() {
 
     let first_token = tokens.first().expect("expected token after first");
     assert_eq!(first_token.content, "again");
-    assert_eq!(first_token.token_type, &token::TokenType::Keyword);
+    assert_eq!(first_token.token_type, &token::TokenType::Alphabetic);
 
     let last_token = tokens.get(2).expect("expected token after get");
     assert_eq!(last_token.content, "thisforme");
-    assert_eq!(last_token.token_type, &token::TokenType::Keyword);
+    assert_eq!(last_token.token_type, &token::TokenType::Alphabetic);
+}
+
+#[test]
+fn test_assignment_symbol()
+{
+    let tokens =
+        tokenize_line(String::from("thisforme;="), &token::RULES).expect("expect tokens");
+    assert_eq!(tokens.len(), 3);
+
+    let last_token = tokens.get(0).expect("expected token after get");
+    assert_eq!(last_token.content, "=");
+    assert_eq!(last_token.token_type, &token::TokenType::AssignmentSymbol);   
 }
