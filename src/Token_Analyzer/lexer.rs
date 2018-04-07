@@ -87,13 +87,32 @@ fn test_alphabetic() {
 }
 
 #[test]
-fn test_assignment_symbol()
-{
-    let tokens =
-        tokenize_line(String::from("thisforme;="), &token::RULES).expect("expect tokens");
+fn test_assignment_symbol() {
+    let tokens = tokenize_line(String::from("thisforme;="), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 3);
 
     let last_token = tokens.get(0).expect("expected token after get");
     assert_eq!(last_token.content, "=");
-    assert_eq!(last_token.token_type, &token::TokenType::AssignmentSymbol);   
+    assert_eq!(last_token.token_type, &token::TokenType::AssignmentSymbol);
+}
+
+#[test]
+fn test_artihmetic_symbol() {
+    let tokens = tokenize_line(String::from("stuff<try>*okay-;+this/"), &token::RULES)
+        .expect("expect tokens");
+    assert_eq!(tokens.len(), 11);
+    let mut test = vec!["/", "+", "-", "*", ">", "<"];
+    test.reverse();
+    let filtered_tokens = tokens
+        .iter()
+        .filter(|filt| test.contains(&&*filt.content))
+        .collect::<Vec<_>>();
+    assert_eq!(filtered_tokens.len(), test.len());
+    filtered_tokens
+        .iter()
+        .map(|t| {
+            assert_eq!(t.content, test.pop().expect("error unwrapping test data"));
+            assert_eq!(t.token_type, &token::TokenType::Arithmentic);
+        })
+        .collect::<Vec<_>>();
 }

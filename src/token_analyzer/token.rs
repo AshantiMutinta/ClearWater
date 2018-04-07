@@ -25,7 +25,8 @@ pub enum TokenType {
     Space,
     SpecialCharacter,
     EndingTerminator,
-    AssignmentSymbol
+    AssignmentSymbol,
+    Arithmentic,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -59,10 +60,11 @@ impl<'a> PartialEq for TokenMatch<'a> {
     }
 }
 
-pub static ALPHABETIC: &'static str = r"[A-z]+$";
+static ALPHABETIC: &'static str = r"[A-z]+$";
 
-pub static ENDING_TERMINATOR: &'static str = ";";
-pub static ASSIGNMENT_SYMBOL : &'static str = "=";
+static ENDING_TERMINATOR: &'static str = ";";
+static ASSIGNMENT_SYMBOL: &'static str = "=";
+static ARITHMETIC_SYMBOL: &'static str = r"\+|-|/|<|>|\*";
 
 lazy_static! {
     pub static ref RULES: Vec<TokenRules<'static>> = {
@@ -78,6 +80,10 @@ lazy_static! {
             TokenRules{
                 token_type : &TokenType::AssignmentSymbol,
                 regex_rule : String::from(ASSIGNMENT_SYMBOL)
+            },
+            TokenRules{
+                token_type : &TokenType::Arithmentic,
+                regex_rule : String::from(ARITHMETIC_SYMBOL)
             }
         ]
 
