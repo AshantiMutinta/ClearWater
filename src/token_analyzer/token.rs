@@ -27,7 +27,7 @@ pub enum TokenType {
     EndingTerminator,
     AssignmentSymbol,
     Arithmentic,
-    SinlgeQuote
+    SinlgeQuote,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -66,8 +66,8 @@ static ALPHABETIC: &'static str = r"[A-z]+$";
 static ENDING_TERMINATOR: &'static str = ";";
 static ASSIGNMENT_SYMBOL: &'static str = "=";
 static ARITHMETIC_SYMBOL: &'static str = r"\+|-|/|<|>|\*";
-static SINGLE_QUOTE : &'static str ="'";
-static SPACE : &'static str =" ";
+static SINGLE_QUOTE: &'static str = "'";
+static SPACE: &'static str = " ";
 
 lazy_static! {
     pub static ref RULES: Vec<TokenRules<'static>> = {

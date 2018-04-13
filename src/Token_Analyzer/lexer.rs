@@ -97,8 +97,7 @@ fn test_assignment_symbol() {
 }
 
 #[test]
-fn test_space()
-{
+fn test_space() {
     let tokens = tokenize_line(String::from("  try"), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 3);
 
