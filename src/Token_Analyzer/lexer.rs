@@ -63,7 +63,7 @@ fn tokenize_line<'a>(
 
 #[test]
 fn test_ending_terminator() {
-    let tokens = tokenize_line(String::from(" ; ; "), &token::RULES).expect("expect tokens");
+    let tokens = tokenize_line(String::from(";;"), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 2);
 
     let first_token = tokens.first().expect("expected token after first");
@@ -94,6 +94,43 @@ fn test_assignment_symbol() {
     let last_token = tokens.get(0).expect("expected token after get");
     assert_eq!(last_token.content, "=");
     assert_eq!(last_token.token_type, &token::TokenType::AssignmentSymbol);
+}
+
+#[test]
+fn test_space()
+{
+    let tokens = tokenize_line(String::from("  try"), &token::RULES).expect("expect tokens");
+    assert_eq!(tokens.len(), 3);
+
+    let last_token = tokens.get(2).expect("expected token after get");
+    assert_eq!(last_token.content, " ");
+    assert_eq!(last_token.token_type, &token::TokenType::Space);
+
+    let middle_token = tokens.get(1).expect("expected token after get");
+    assert_eq!(middle_token.content, " ");
+    assert_eq!(middle_token.token_type, &token::TokenType::Space);
+
+    let first_token = tokens.get(0).expect("expected token after get");
+    assert_eq!(first_token.content, "try");
+    assert_eq!(first_token.token_type, &token::TokenType::Alphabetic);
+}
+
+#[test]
+fn test_single_quote() {
+    let tokens = tokenize_line(String::from("' tryme'"), &token::RULES).expect("expect tokens");
+    assert_eq!(tokens.len(), 4);
+
+    let last_token = tokens.get(3).expect("expected token after get");
+    assert_eq!(last_token.content, "'");
+    assert_eq!(last_token.token_type, &token::TokenType::SinlgeQuote);
+
+    let middle_token = tokens.get(2).expect("expected token after get");
+    assert_eq!(middle_token.content, " ");
+    assert_eq!(middle_token.token_type, &token::TokenType::Space);
+
+    let first_token = tokens.get(0).expect("expected token after get");
+    assert_eq!(first_token.content, "'");
+    assert_eq!(first_token.token_type, &token::TokenType::SinlgeQuote);
 }
 
 #[test]
