@@ -4,6 +4,16 @@ use self::regex::Regex;
 use std::collections::BinaryHeap;
 use token_analyzer::token;
 
+
+fn tokenize_source_code(mut source_code : String) -> Vec<Result<Vec<token::Token<'static>>, token::TokenError>>
+{
+    source_code.split(";").map(|line_of_code|
+    {
+        tokenize_line(String::from(line_of_code), &token::RULES)
+    }).collect::<Vec<_>>()
+}
+
+
 fn tokenize_line<'a>(
     line_of_code: String,
     token_rules: &'a Vec<token::TokenRules>,
