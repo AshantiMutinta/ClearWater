@@ -97,6 +97,17 @@ fn test_assignment_symbol() {
 }
 
 #[test]
+fn test_numeric_symbol() {
+    let tokens =
+        tokenize_line(String::from("thisforme;=1234"), &token::RULES).expect("expect tokens");
+    assert_eq!(tokens.len(), 4);
+
+    let last_token = tokens.get(0).expect("expected token after get");
+    assert_eq!(last_token.content, "1234");
+    assert_eq!(last_token.token_type, &token::TokenType::Numeric);
+}
+
+#[test]
 fn test_space() {
     let tokens = tokenize_line(String::from("  try"), &token::RULES).expect("expect tokens");
     assert_eq!(tokens.len(), 3);

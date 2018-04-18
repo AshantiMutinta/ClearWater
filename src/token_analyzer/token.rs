@@ -19,8 +19,7 @@ pub enum TokenError {
 #[derive(PartialEq, Eq, Debug)]
 pub enum TokenType {
     Alphanumeric,
-    Literal,
-    Number,
+    Numeric,
     Alphabetic,
     Space,
     SpecialCharacter,
@@ -62,7 +61,7 @@ impl<'a> PartialEq for TokenMatch<'a> {
 }
 
 static ALPHABETIC: &'static str = r"[A-z]+$";
-
+static NUMERIC: &'static str = r"[0-9]+$";
 static ENDING_TERMINATOR: &'static str = ";";
 static ASSIGNMENT_SYMBOL: &'static str = "=";
 static ARITHMETIC_SYMBOL: &'static str = r"\+|-|/|<|>|\*";
@@ -95,6 +94,10 @@ lazy_static! {
             TokenRules{
                 token_type : &TokenType::Space,
                 regex_rule : String::from(SPACE)
+            },
+            TokenRules{
+                token_type :&TokenType::Numeric,
+                regex_rule : String::from(NUMERIC)
             }
         ]
 
