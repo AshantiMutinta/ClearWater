@@ -27,6 +27,7 @@ pub enum TokenType {
     AssignmentSymbol,
     Arithmentic,
     SinlgeQuote,
+    Newline,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -67,6 +68,7 @@ static ASSIGNMENT_SYMBOL: &'static str = "=";
 static ARITHMETIC_SYMBOL: &'static str = r"\+|-|/|<|>|\*";
 static SINGLE_QUOTE: &'static str = "'";
 static SPACE: &'static str = " ";
+static NEWLINE: &'static str = "\n";
 
 lazy_static! {
     pub static ref RULES: Vec<TokenRules<'static>> = {
@@ -98,6 +100,10 @@ lazy_static! {
             TokenRules{
                 token_type :&TokenType::Numeric,
                 regex_rule : String::from(NUMERIC)
+            },
+            TokenRules{
+                token_type : &TokenType::Newline,
+                regex_rule : String::from(NEWLINE)
             }
         ]
 

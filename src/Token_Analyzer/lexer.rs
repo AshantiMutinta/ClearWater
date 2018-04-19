@@ -4,15 +4,14 @@ use self::regex::Regex;
 use std::collections::BinaryHeap;
 use token_analyzer::token;
 
-
-fn tokenize_source_code(mut source_code : String) -> Vec<Result<Vec<token::Token<'static>>, token::TokenError>>
-{
-    source_code.split(";").map(|line_of_code|
-    {
-        tokenize_line(String::from(line_of_code), &token::RULES)
-    }).collect::<Vec<_>>()
+fn tokenize_source_code(
+    source_code: String,
+) -> Vec<Result<Vec<token::Token<'static>>, token::TokenError>> {
+    source_code
+        .split(";")
+        .map(|line_of_code| tokenize_line(String::from(line_of_code), &token::RULES))
+        .collect::<Vec<_>>()
 }
-
 
 fn tokenize_line<'a>(
     line_of_code: String,
@@ -115,6 +114,17 @@ fn test_numeric_symbol() {
     let last_token = tokens.get(0).expect("expected token after get");
     assert_eq!(last_token.content, "1234");
     assert_eq!(last_token.token_type, &token::TokenType::Numeric);
+}
+
+#[test]
+fn test_newline_symbol() {
+    let tokens =
+        tokenize_line(String::from("thisforme;=1234\n"), &token::RULES).expect("expect tokens");
+    assert_eq!(tokens.len(), 5);
+
+    let last_token = tokens.get(0).expect("expected token after get");
+    assert_eq!(last_token.content, "\n");
+    assert_eq!(last_token.token_type, &token::TokenType::Newline);
 }
 
 #[test]
