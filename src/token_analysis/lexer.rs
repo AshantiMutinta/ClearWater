@@ -2,7 +2,7 @@ extern crate regex;
 
 use self::regex::Regex;
 use std::collections::BinaryHeap;
-use token_analyzer::token;
+use token_analysis::token;
 
 fn tokenize_source_code(
     source_code: String,
@@ -13,15 +13,8 @@ fn tokenize_source_code(
         .collect::<Vec<_>>()
 }
 
-fn tokenize_line<'a>(
-    line_of_code: String,
-    token_rules: &'a Vec<token::TokenRules>,
-) -> Result<Vec<token::Token<'a>>, token::TokenError> {
-    if line_of_code.len() <= 0 {
-        Err(token::TokenError::EmptyLineOfCode)
-    } else {
-        let mut tokens = vec![];
-        let mut match_heap = BinaryHeap::new();
+fn addTokensToBinaryHeap<'a>(line_of_code:&String,match_heap : &mut BinaryHeap<token::TokenMatch<'a>>,token_rules: &'a Vec<token::TokenRules>) 
+{
         token_rules
             .iter()
             .map(|token_match_rule| {
@@ -46,18 +39,34 @@ fn tokenize_line<'a>(
                 };
             })
             .collect::<Vec<_>>();
+     
+}
+
+fn slice_line_of_code<'a>(first_match : token::TokenMatch,line_of_code : &String) -> String
+{
+    let mut mutable_line_of_code = line_of_code.clone();
+    mutable_line_of_code.split_off(first_match.begin_segmet);
+    let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
+    mutable_line_of_code.push_str(&end_range);
+    mutable_line_of_code
+}
+fn tokenize_line<'a>(
+    line_of_code: String,
+    token_rules: &'a Vec<token::TokenRules>,
+) -> Result<Vec<token::Token<'a>>, token::TokenError> {
+    if line_of_code.len() <= 0 {
+        Err(token::TokenError::EmptyLineOfCode)
+    } else {
+        let mut tokens = vec![];
+        let mut match_heap = BinaryHeap::new();
+        addTokensToBinaryHeap(&line_of_code, &mut match_heap, token_rules);
         match match_heap.pop() {
             Some(first_match) => {
                 tokens.push(token::Token {
                     content: first_match.literal.clone(),
                     token_type: &first_match.rule.token_type,
                 });
-
-                let mut mutable_line_of_code = line_of_code.clone();
-                mutable_line_of_code.split_off(first_match.begin_segmet);
-                let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
-                mutable_line_of_code.push_str(&end_range);
-                match tokenize_line(mutable_line_of_code, token_rules) {
+                match tokenize_line(slice_line_of_code(first_match, &line_of_code), token_rules) {
                     Ok(tokenized) => {
                         tokens.extend(tokenized);
                         Ok(tokens)
