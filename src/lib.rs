@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate lazy_static;
 
-pub mod token_analysis;
 pub mod syntax_analysis;
+pub mod token_analysis;
 
 #[cfg(test)]
 mod tests {

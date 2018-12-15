@@ -13,37 +13,34 @@ fn tokenize_source_code(
         .collect::<Vec<_>>()
 }
 
-fn addTokensToBinaryHeap<'a>(line_of_code:&String,match_heap : &mut BinaryHeap<token::TokenMatch<'a>>,token_rules: &'a Vec<token::TokenRules>) 
-{
-        token_rules
-            .iter()
-            .map(|token_match_rule| {
-                match Regex::new(&token_match_rule.regex_rule) {
-                    Ok(regex) => {
-                        let matched_rules = regex.find_iter(&line_of_code);
-
-                        matched_rules
-                            .map(|t| {
-                                match_heap.push(token::TokenMatch {
-                                    literal: String::from(t.as_str()),
-                                    begin_segmet: t.start().clone(),
-                                    end_segment: t.end().clone(),
-                                    rule: token_match_rule,
-                                });
-                            })
-                            .collect::<Vec<_>>();
-                    }
-                    Err(_) => {
-                        ();
-                    }
-                };
-            })
-            .collect::<Vec<_>>();
-     
+fn addTokensToBinaryHeap<'a>(
+    line_of_code: &String,
+    match_heap: &mut BinaryHeap<token::TokenMatch<'a>>,
+    token_rules: &'a Vec<token::TokenRules>,
+) {
+    token_rules
+        .iter()
+        .map(|token_match_rule| {
+            Regex::new(&token_match_rule.regex_rule)
+                .map(|regex| {
+                    let matched_rules = regex.find_iter(&line_of_code);
+                    matched_rules
+                        .map(|t| {
+                            match_heap.push(token::TokenMatch {
+                                literal: String::from(t.as_str()),
+                                begin_segmet: t.start().clone(),
+                                end_segment: t.end().clone(),
+                                rule: token_match_rule,
+                            });
+                        })
+                        .collect::<Vec<_>>();
+                })
+                .map_err(|_| ());
+        })
+        .collect::<Vec<_>>();
 }
 
-fn slice_line_of_code<'a>(first_match : token::TokenMatch,line_of_code : &String) -> String
-{
+fn slice_line_of_code<'a>(first_match: token::TokenMatch, line_of_code: &String) -> String {
     let mut mutable_line_of_code = line_of_code.clone();
     mutable_line_of_code.split_off(first_match.begin_segmet);
     let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
@@ -60,22 +57,21 @@ fn tokenize_line<'a>(
         let mut tokens = vec![];
         let mut match_heap = BinaryHeap::new();
         addTokensToBinaryHeap(&line_of_code, &mut match_heap, token_rules);
-        match match_heap.pop() {
-            Some(first_match) => {
+        match_heap
+            .pop()
+            .ok_or_else(|| token::TokenError::NoMatch)
+            .and_then(|first_match| {
                 tokens.push(token::Token {
                     content: first_match.literal.clone(),
                     token_type: &first_match.rule.token_type,
                 });
-                match tokenize_line(slice_line_of_code(first_match, &line_of_code), token_rules) {
-                    Ok(tokenized) => {
+                tokenize_line(slice_line_of_code(first_match, &line_of_code), token_rules)
+                    .map(|tokenized| {
                         tokens.extend(tokenized);
-                        Ok(tokens)
-                    }
-                    Err(_) => Ok(tokens),
-                }
-            }
-            None => Err(token::TokenError::NoMatch),
-        }
+                        Ok(tokens.clone())
+                    })
+                    .unwrap_or(Ok(tokens.clone()))
+            })
     }
 }
 
@@ -174,10 +170,10 @@ fn test_single_quote() {
 
 #[test]
 fn test_artihmetic_symbol() {
-    let tokens = tokenize_line(String::from("stuff<try>*okay-;+this/"), &token::RULES)
+    let tokens = tokenize_line(String::from("stuff<try>*okay-;+this/j:"), &token::RULES)
         .expect("expect tokens");
     assert_eq!(tokens.len(), 11);
-    let mut test = vec!["/", "+", "-", "*", ">", "<"];
+    let mut test = vec!["/", "+", "-", "*", ">", "<", ":"];
     test.reverse();
     let filtered_tokens = tokens
         .iter()
