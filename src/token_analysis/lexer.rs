@@ -43,7 +43,7 @@ fn addTokensToBinaryHeap<'a>(
 fn slice_line_of_code<'a>(first_match: token::TokenMatch, line_of_code: &String) -> String {
     let mut mutable_line_of_code = line_of_code.clone();
     mutable_line_of_code.split_off(first_match.begin_segmet);
-    let mut end_range = line_of_code.clone().split_off(first_match.end_segment);
+    let end_range = line_of_code.clone().split_off(first_match.end_segment);
     mutable_line_of_code.push_str(&end_range);
     mutable_line_of_code
 }
